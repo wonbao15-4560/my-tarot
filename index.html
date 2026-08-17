@@ -1,244 +1,957 @@
-from pathlib import Path
-
-html = r'''<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>🔮 나의 타로방</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔮 나의 타로 도감</title>
+
 <style>
-*{box-sizing:border-box}
-body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif;background:radial-gradient(circle at top,#2b1850,#0c0718 55%,#07050d);color:#fff;min-height:100vh}
-button,input,textarea{font:inherit}
-.wrap{max-width:900px;margin:auto;padding:20px 15px 60px}
-.hero{padding:25px 5px 20px;text-align:center}
-.hero h1{font-size:32px;margin:0 0 8px}
-.hero p{margin:0;color:#d8cbea}
-.search{display:flex;gap:10px;margin:18px 0}
-.search input{flex:1;padding:15px 17px;border:1px solid #8d6bb8;border-radius:16px;background:#171021;color:#fff;outline:none}
-.card{background:rgba(24,15,39,.92);border:1px solid #5d4778;border-radius:22px;padding:18px;margin:14px 0;box-shadow:0 12px 35px #0004}
-.deck-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
-.deck{cursor:pointer;transition:.2s}
-.deck:hover{transform:translateY(-2px);border-color:#c59cff}
-.deck h3{margin:5px 0 8px}
-.muted{color:#b9acc8}
-.badge{display:inline-block;padding:5px 9px;border-radius:999px;background:#3b2455;color:#e7d8ff;font-size:13px}
-.progress{height:10px;background:#31243d;border-radius:99px;overflow:hidden;margin:12px 0}
-.progress>div{height:100%;background:linear-gradient(90deg,#a96cff,#e9c9ff);width:0}
-.btn{border:0;border-radius:13px;padding:11px 15px;background:#8d5bd1;color:#fff;font-weight:700;cursor:pointer}
-.btn.secondary{background:#2b2037;border:1px solid #60497a}
-.btn.green{background:#3d9b67}
-.back{margin-bottom:12px}
-.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
-.tarot{min-height:150px;text-align:left;position:relative}
-.tarot .symbol{font-size:34px}
-.tarot.learned{border-color:#8fd6a8}
-.tarot .check{position:absolute;right:10px;top:10px;color:#8ff0af}
-.detail{display:none}
-.detail.show{display:block}
-textarea{width:100%;min-height:120px;resize:vertical;background:#130d1c;color:#fff;border:1px solid #624b7c;border-radius:14px;padding:14px}
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.tabs{display:flex;gap:8px;overflow:auto;margin:14px 0}
-.tabs button{white-space:nowrap}
-.result{margin-top:10px}
-.drawn{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.drawcard{min-height:180px;text-align:center;padding:16px;border:1px solid #76558f;border-radius:18px;background:#1b1228}
-.small{font-size:13px;color:#b9acc8}
-.empty{text-align:center;padding:35px;color:#b9acc8}
-.notice{padding:12px 14px;border-radius:14px;background:#20142d;color:#dfd0ee;margin:10px 0}
-@media(max-width:500px){.hero h1{font-size:27px}.drawn{grid-template-columns:1fr}.card-grid{grid-template-columns:repeat(2,1fr)}}
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:Arial,"Noto Sans KR",sans-serif;
+  background:#f7f3ff;
+  color:#292334;
+}
+
+header{
+  background:linear-gradient(135deg,#6c3fa5,#9b6bd3);
+  color:white;
+  padding:28px 18px 24px;
+  text-align:center;
+}
+
+header h1{
+  margin:0 0 8px;
+  font-size:28px;
+}
+
+header p{
+  margin:0;
+  opacity:.9;
+}
+
+.container{
+  max-width:850px;
+  margin:auto;
+  padding:20px;
+}
+
+.search{
+  width:100%;
+  padding:16px 18px;
+  border:2px solid #ded1f0;
+  border-radius:16px;
+  font-size:16px;
+  outline:none;
+  background:white;
+}
+
+.search:focus{
+  border-color:#8654bd;
+}
+
+.section-title{
+  margin:25px 0 12px;
+  font-size:21px;
+}
+
+.deck-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:12px;
+}
+
+.deck{
+  background:white;
+  border:2px solid #e5d9f2;
+  border-radius:18px;
+  padding:18px 12px;
+  cursor:pointer;
+  transition:.2s;
+  text-align:center;
+}
+
+.deck:hover{
+  transform:translateY(-2px);
+  border-color:#9364c7;
+}
+
+.deck .symbol{
+  font-size:35px;
+  margin-bottom:8px;
+}
+
+.deck h3{
+  margin:5px 0;
+  font-size:17px;
+}
+
+.deck p{
+  margin:5px 0 0;
+  color:#777;
+  font-size:13px;
+}
+
+.hidden{
+  display:none;
+}
+
+.back{
+  border:0;
+  background:white;
+  border-radius:12px;
+  padding:11px 15px;
+  font-size:15px;
+  cursor:pointer;
+  margin-bottom:15px;
+}
+
+.deck-header{
+  background:white;
+  border-radius:20px;
+  padding:20px;
+  box-shadow:0 3px 12px #0000000d;
+}
+
+.deck-header h2{
+  margin:0 0 8px;
+}
+
+.stats{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:15px;
+}
+
+.stat{
+  flex:1;
+  min-width:120px;
+  background:#f1e9fb;
+  border-radius:14px;
+  padding:14px;
+  text-align:center;
+}
+
+.stat strong{
+  display:block;
+  font-size:24px;
+  color:#7041a4;
+}
+
+.card-search{
+  margin:18px 0;
+}
+
+.card-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(145px,1fr));
+  gap:12px;
+}
+
+.tarot-card{
+  background:white;
+  border:2px solid #e6dced;
+  border-radius:18px;
+  padding:18px 12px;
+  min-height:145px;
+  cursor:pointer;
+  text-align:center;
+  position:relative;
+}
+
+.tarot-card.learned{
+  border-color:#8b5bb9;
+  background:#fcf9ff;
+}
+
+.card-number{
+  color:#9877b5;
+  font-size:12px;
+  margin-bottom:8px;
+}
+
+.card-name{
+  font-weight:bold;
+  font-size:17px;
+  margin:12px 0;
+}
+
+.question{
+  font-size:30px;
+  color:#aaa;
+  margin:15px 0;
+}
+
+.learn-badge{
+  display:inline-block;
+  background:#eee3fa;
+  color:#7041a4;
+  padding:5px 9px;
+  border-radius:20px;
+  font-size:11px;
+}
+
+.card-detail{
+  background:white;
+  border-radius:20px;
+  padding:22px;
+}
+
+.card-detail h2{
+  margin-top:0;
+}
+
+.meaning{
+  background:#f6f0fc;
+  padding:15px;
+  border-radius:14px;
+  line-height:1.6;
+}
+
+label{
+  display:block;
+  font-weight:bold;
+  margin:20px 0 8px;
+}
+
+textarea{
+  width:100%;
+  min-height:160px;
+  resize:vertical;
+  border:2px solid #ded1f0;
+  border-radius:14px;
+  padding:14px;
+  font-size:15px;
+  font-family:inherit;
+  outline:none;
+}
+
+textarea:focus{
+  border-color:#8654bd;
+}
+
+button.primary{
+  width:100%;
+  margin-top:14px;
+  border:0;
+  background:#7547a9;
+  color:white;
+  padding:15px;
+  border-radius:14px;
+  font-size:16px;
+  cursor:pointer;
+}
+
+button.primary:hover{
+  background:#62388f;
+}
+
+.learn-button{
+  width:100%;
+  margin-top:12px;
+  padding:14px;
+  border-radius:14px;
+  border:2px solid #7547a9;
+  background:white;
+  color:#7547a9;
+  font-size:16px;
+  cursor:pointer;
+}
+
+.learn-button.active{
+  background:#7547a9;
+  color:white;
+}
+
+.empty{
+  text-align:center;
+  padding:30px;
+  color:#777;
+}
+
+footer{
+  text-align:center;
+  color:#888;
+  padding:30px 15px;
+  font-size:12px;
+}
 </style>
 </head>
+
 <body>
-<div class="wrap">
-  <section class="hero">
-    <h1>🔮 나의 타로방</h1>
-    <p>배우고 · 기록하고 · 뽑아보는 나만의 타로 도감</p>
+
+<header>
+  <h1>🔮 나의 타로 도감</h1>
+  <p>배운 타로 카드를 기록하고 나만의 도감을 만들어보세요.</p>
+</header>
+
+<div class="container">
+
+  <!-- 메인 -->
+  <section id="home">
+
+    <input
+      id="deckSearch"
+      class="search"
+      placeholder="🔎 타로 카드 종류를 검색해보세요"
+      oninput="searchDecks()"
+    >
+
+    <h2 class="section-title">📚 타로 카드 도감</h2>
+
+    <div id="deckList" class="deck-grid"></div>
+
   </section>
 
-  <div id="home">
-    <div class="card">
-      <h2>🃏 배우고 싶은 카드를 찾아보세요</h2>
-      <div class="search">
-        <input id="deckSearch" placeholder="예: 기본카드, 벨린, 호로스코프">
-      </div>
-      <div id="deckList" class="deck-grid"></div>
-    </div>
 
-    <div class="card">
-      <h2>📚 나의 타로 도감</h2>
-      <div id="summary"></div>
-    </div>
+  <!-- 덱 화면 -->
+  <section id="deckPage" class="hidden">
 
-    <div class="card">
-      <h2>📝 나의 메모</h2>
-      <textarea id="memo" placeholder="공부하면서 기억하고 싶은 것, 오늘의 생각을 적어보세요."></textarea>
-      <br><br><button class="btn green" onclick="saveMemo()">메모 저장</button>
-    </div>
+    <button class="back" onclick="goHome()">← 타로 종류로 돌아가기</button>
 
-    <div class="card">
-      <h2>🔮 고민 타로</h2>
-      <p class="muted">연애운, 올해운, 내년운, 공부운 등 고민을 적으면 3장을 뽑아 해설해드려요.</p>
-      <div class="search"><input id="question" placeholder="예: 올해 새로운 친구를 잘 사귈 수 있을까?"></div>
-      <div class="row">
-        <select id="fortuneType" style="padding:12px;border-radius:12px;background:#171021;color:white;border:1px solid #60497a">
-          <option>전체운</option><option>연애운</option><option>공부운</option><option>친구운</option><option>올해운</option><option>내년운</option>
-        </select>
-        <button class="btn" onclick="drawThree()">카드 3장 뽑기 🔮</button>
-      </div>
-      <div id="reading"></div>
-    </div>
-  </div>
+    <div id="deckInfo" class="deck-header"></div>
 
-  <div id="deckView" style="display:none">
-    <button class="btn secondary back" onclick="goHome()">← 도감으로 돌아가기</button>
-    <div class="card">
-      <h2 id="deckTitle"></h2>
-      <p id="deckDesc" class="muted"></p>
-      <div id="deckProgressText"></div>
-      <div class="progress"><div id="deckProgress"></div></div>
-    </div>
+    <input
+      id="cardSearch"
+      class="search card-search"
+      placeholder="🔎 카드 이름 검색"
+      oninput="searchCards()"
+    >
 
-    <div class="card">
-      <div class="search">
-        <input id="cardSearch" placeholder="이 카드 안에서 카드 이름 검색">
-      </div>
-      <div id="cardList" class="card-grid"></div>
-    </div>
+    <div id="cardList" class="card-grid"></div>
 
-    <div id="cardDetail" class="card detail">
-      <div class="row" style="justify-content:space-between">
-        <h2 id="detailTitle"></h2>
-        <button class="btn secondary" onclick="closeDetail()">닫기</button>
-      </div>
-      <p id="detailMeaning"></p>
-      <div class="notice"><b>연애:</b> <span id="detailLove"></span><br><b>공부:</b> <span id="detailStudy"></span><br><b>전체:</b> <span id="detailGeneral"></span></div>
-      <textarea id="cardNote" placeholder="이 카드에 대해 내가 공부한 내용을 적어보세요."></textarea>
-      <br><br>
-      <div class="row">
-        <button class="btn green" id="learnBtn"></button>
-        <button class="btn secondary" onclick="saveCardNote()">공부 메모 저장</button>
-      </div>
-    </div>
-  </div>
+  </section>
+
+
+  <!-- 카드 상세 -->
+  <section id="cardPage" class="hidden">
+
+    <button class="back" onclick="backToDeck()">← 카드 도감으로 돌아가기</button>
+
+    <div id="cardDetail" class="card-detail"></div>
+
+  </section>
+
 </div>
 
+<footer>
+  나의 타로 도감 🔮 · 학습 기록은 이 기기의 브라우저에 저장됩니다.
+</footer>
+
+
 <script>
-const decks = {
-  "기본카드": {
-    count:78, desc:"라이더-웨이트 계열의 기본 타로 78장을 공부하는 도감입니다.",
+
+/* =========================
+   타로 카드 데이터
+========================= */
+
+const majorArcana = [
+  "바보",
+  "마법사",
+  "여사제",
+  "여황제",
+  "황제",
+  "교황",
+  "연인",
+  "전차",
+  "힘",
+  "은둔자",
+  "운명의 수레바퀴",
+  "정의",
+  "매달린 사람",
+  "죽음",
+  "절제",
+  "악마",
+  "탑",
+  "별",
+  "달",
+  "태양",
+  "심판",
+  "세계"
+];
+
+const wands = [
+  "지팡이 에이스",
+  "지팡이 2",
+  "지팡이 3",
+  "지팡이 4",
+  "지팡이 5",
+  "지팡이 6",
+  "지팡이 7",
+  "지팡이 8",
+  "지팡이 9",
+  "지팡이 10",
+  "지팡이 시종",
+  "지팡이 기사",
+  "지팡이 여왕",
+  "지팡이 왕"
+];
+
+const cups = [
+  "컵 에이스",
+  "컵 2",
+  "컵 3",
+  "컵 4",
+  "컵 5",
+  "컵 6",
+  "컵 7",
+  "컵 8",
+  "컵 9",
+  "컵 10",
+  "컵 시종",
+  "컵 기사",
+  "컵 여왕",
+  "컵 왕"
+];
+
+const swords = [
+  "검 에이스",
+  "검 2",
+  "검 3",
+  "검 4",
+  "검 5",
+  "검 6",
+  "검 7",
+  "검 8",
+  "검 9",
+  "검 10",
+  "검 시종",
+  "검 기사",
+  "검 여왕",
+  "검 왕"
+];
+
+const pentacles = [
+  "펜타클 에이스",
+  "펜타클 2",
+  "펜타클 3",
+  "펜타클 4",
+  "펜타클 5",
+  "펜타클 6",
+  "펜타클 7",
+  "펜타클 8",
+  "펜타클 9",
+  "펜타클 10",
+  "펜타클 시종",
+  "펜타클 기사",
+  "펜타클 여왕",
+  "펜타클 왕"
+];
+
+const riderCards = [
+  ...majorArcana,
+  ...wands,
+  ...cups,
+  ...swords,
+  ...pentacles
+];
+
+
+/* =========================
+   덱 목록
+========================= */
+
+const decks = [
+  {
+    id:"marseille",
+    name:"마르세유 타로",
+    symbol:"🎴",
+    description:"Tarot de Marseille",
+    cards:riderCards
+  },
+  {
+    id:"rider",
+    name:"라이더 웨이트",
+    symbol:"🌟",
+    description:"Rider-Waite-Smith",
+    cards:riderCards
+  },
+  {
+    id:"thoth",
+    name:"토트 타로",
+    symbol:"✨",
+    description:"Thoth Tarot",
+    cards:riderCards
+  },
+  {
+    id:"lenormand",
+    name:"르노르망",
+    symbol:"🃏",
+    description:"Lenormand",
     cards:[
-      ["0","바보","새로운 시작, 자유, 모험"],["I","마법사","의지, 재능, 실행력"],["II","여사제","직관, 비밀, 내면"],["III","여황제","풍요, 창조, 돌봄"],["IV","황제","질서, 책임, 안정"],["V","교황","전통, 배움, 조언"],["VI","연인","선택, 관계, 조화"],["VII","전차","추진력, 승리, 목표"],["VIII","힘","용기, 인내, 자기통제"],["IX","은둔자","성찰, 탐구, 혼자만의 시간"],["X","운명의 수레바퀴","변화, 흐름, 전환"],["XI","정의","균형, 판단, 공정함"],["XII","매달린 사람","기다림, 관점의 변화"],["XIII","죽음","끝과 변화, 새로운 단계"],["XIV","절제","조화, 조절, 회복"],["XV","악마","집착, 유혹, 묶임"],["XVI","탑","갑작스러운 변화, 깨달음"],["XVII","별","희망, 영감, 회복"],["XVIII","달","불확실성, 감정, 직관"],["XIX","태양","기쁨, 성공, 자신감"],["XX","심판","각성, 결단, 새로운 기회"],["XXI","세계","완성, 성취, 다음 단계"],
-      ["W1","지팡이 에이스","열정, 시작, 창의력"],["W2","지팡이 2","계획, 선택, 가능성"],["W3","지팡이 3","확장, 전망, 기다림"],["W4","지팡이 4","축하, 안정, 기쁜 소식"],["W5","지팡이 5","경쟁, 의견 충돌"],["W6","지팡이 6","인정, 승리, 자신감"],["W7","지팡이 7","방어, 입장 지키기"],["W8","지팡이 8","빠른 진행, 소식"],["W9","지팡이 9","경계, 끈기, 회복"],["W10","지팡이 10","책임, 부담, 과로"],["WP","지팡이 시종","호기심, 소식, 도전"],["WK","지팡이 기사","열정, 행동, 모험"],["WQ","지팡이 여왕","자신감, 활력, 독립"],["WKing","지팡이 왕","리더십, 비전, 추진력"],
-      ["C1","컵 에이스","감정의 시작, 사랑, 기쁨"],["C2","컵 2","교감, 협력, 관계"],["C3","컵 3","우정, 축하, 즐거움"],["C4","컵 4","권태, 고민, 마음의 정리"],["C5","컵 5","아쉬움, 상실감, 회복"],["C6","컵 6","추억, 순수함, 과거"],["C7","컵 7","선택지, 상상, 환상"],["C8","컵 8","떠남, 변화, 새로운 길"],["C9","컵 9","만족, 소원, 즐거움"],["C10","컵 10","행복, 화목, 조화"],["CP","컵 시종","감성, 직관, 좋은 소식"],["CK","컵 기사","로맨틱함, 제안, 감정 표현"],["CQ","컵 여왕","공감, 배려, 직관"],["CKing","컵 왕","감정의 균형, 성숙함"],
-      ["S1","소드 에이스","명확함, 진실, 결단"],["S2","소드 2","갈등, 보류, 선택"],["S3","소드 3","실망, 마음의 아픔, 정리"],["S4","소드 4","휴식, 회복, 재충전"],["S5","소드 5","갈등, 경쟁, 교훈"],["S6","소드 6","이동, 전환, 회복"],["S7","소드 7","전략, 신중함, 숨겨진 계획"],["S8","소드 8","제한감, 걱정, 관점"],["S9","소드 9","불안, 걱정, 생각의 과잉"],["S10","소드 10","마무리, 전환, 내려놓기"],["SP","소드 시종","관찰, 정보, 호기심"],["SK","소드 기사","빠른 판단, 행동, 추진"],["SQ","소드 여왕","명료함, 독립, 냉정한 판단"],["SKing","소드 왕","논리, 원칙, 판단력"],
-      ["P1","펜타클 에이스","기회, 현실적 시작, 안정"],["P2","펜타클 2","균형, 조율, 유연함"],["P3","펜타클 3","협력, 실력, 배움"],["P4","펜타클 4","안정, 소유, 집착"],["P5","펜타클 5","어려움, 도움 요청"],["P6","펜타클 6","나눔, 도움, 균형"],["P7","펜타클 7","기다림, 노력의 결과"],["P8","펜타클 8","연습, 숙련, 꾸준함"],["P9","펜타클 9","독립, 성취, 만족"],["P10","펜타클 10","안정, 가족, 장기적 성취"],["PP","펜타클 시종","학습, 현실적 기회"],["PK","펜타클 기사","꾸준함, 책임, 성실"],["PQ","펜타클 여왕","현실감각, 돌봄, 안정"],["PKing","펜타클 왕","성공, 안정, 현실적 성취"]
+      "기수","클로버","배","집","나무","구름","뱀","관","꽃다발",
+      "낫","채찍","새","아이","여우","곰","별","황새","개",
+      "탑","정원","산","갈림길","쥐","심장","반지","책","편지",
+      "남자","여자","백합","태양","달","열쇠","물고기","닻","십자가"
     ]
   },
-  "호로스코프": {
-    count:12, desc:"12별자리 카드를 하나씩 익혀보는 미니 도감입니다.",
-    cards:[["AR","양자리","시작, 용기, 추진력"],["TA","황소자리","안정, 인내, 현실감각"],["GE","쌍둥이자리","소통, 호기심, 변화"],["CA","게자리","보호, 가족, 감정"],["LE","사자자리","자신감, 표현, 창조"],["VI","처녀자리","분석, 정리, 실용성"],["LI","천칭자리","균형, 관계, 조화"],["SC","전갈자리","집중, 변화, 깊이"],["SA","사수자리","탐험, 낙관, 성장"],["CA2","염소자리","책임, 목표, 성취"],["AQ","물병자리","독창성, 자유, 새로운 생각"],["PI","물고기자리","공감, 상상, 직관"]]
+  {
+    id:"golden",
+    name:"골든 던 계열",
+    symbol:"☀️",
+    description:"Golden Dawn",
+    cards:riderCards
   },
-  "벨린": {
-    count:53, desc:"벨린 계열 카드를 공부할 수 있도록 구성한 도감입니다.",
-    cards:Array.from({length:53},(_,i)=>[String(i+1),"벨린 카드 "+(i+1),"카드의 상징과 키워드를 공부해보세요."])
+  {
+    id:"visconti",
+    name:"비스콘티 스포르차",
+    symbol:"👑",
+    description:"Visconti-Sforza",
+    cards:majorArcana
+  },
+  {
+    id:"italian",
+    name:"이탈리아 전통 타로",
+    symbol:"🇮🇹",
+    description:"Italian Tarot",
+    cards:riderCards
+  },
+  {
+    id:"english",
+    name:"영국 전통 타로",
+    symbol:"🇬🇧",
+    description:"English Tarot",
+    cards:riderCards
+  },
+  {
+    id:"oracle",
+    name:"오라클 카드",
+    symbol:"🔮",
+    description:"Oracle Cards",
+    cards:[
+      "새로운 시작",
+      "사랑",
+      "우정",
+      "용기",
+      "성장",
+      "변화",
+      "치유",
+      "행운",
+      "직관",
+      "희망",
+      "평화",
+      "성공"
+    ]
   }
-};
+];
 
-let state = JSON.parse(localStorage.getItem("myTarotState")||'{"learned":{},"notes":{},"memo":""}');
-let currentDeck = null, currentCard = null;
 
-function save(){localStorage.setItem("myTarotState",JSON.stringify(state));}
-function learnedCount(name){return (state.learned[name]||[]).length}
-function renderDecks(filter=""){
-  const list=document.getElementById("deckList");
-  const arr=Object.keys(decks).filter(x=>x.toLowerCase().includes(filter.toLowerCase()));
-  list.innerHTML=arr.length?arr.map(name=>{
-    const d=decks[name], n=learnedCount(name), p=Math.round(n/d.count*100);
-    return `<div class="card deck" onclick="openDeck('${name}')">
-      <span class="badge">타로 도감</span><h3>🔮 ${name}</h3>
-      <div class="muted">${d.desc}</div>
-      <p><b>${n}/${d.count}</b> 학습 완료</p>
-      <div class="progress"><div style="width:${p}%"></div></div>
-      <span class="small">클릭해서 카드 배우기 →</span>
-    </div>`
-  }).join(""):`<div class="empty">찾는 타로가 없어요.</div>`;
-  const total=Object.values(decks).reduce((a,d)=>a+d.count,0);
-  const done=Object.keys(decks).reduce((a,k)=>a+learnedCount(k),0);
-  document.getElementById("summary").innerHTML=`<div class="row"><span class="badge">전체 ${done}/${total}</span><span class="muted">배운 카드가 자동으로 저장돼요.</span></div>
-  <div class="progress"><div style="width:${total?done/total*100:0}%"></div></div>`;
+/* =========================
+   저장 데이터
+========================= */
+
+let learned =
+  JSON.parse(localStorage.getItem("tarotLearned") || "{}");
+
+let notes =
+  JSON.parse(localStorage.getItem("tarotNotes") || "{}");
+
+let currentDeck = null;
+let currentCard = null;
+
+
+function saveData(){
+
+  localStorage.setItem(
+    "tarotLearned",
+    JSON.stringify(learned)
+  );
+
+  localStorage.setItem(
+    "tarotNotes",
+    JSON.stringify(notes)
+  );
 }
-function openDeck(name){
-  currentDeck=name; document.getElementById("home").style.display="none"; document.getElementById("deckView").style.display="block";
-  document.getElementById("deckTitle").textContent="🔮 "+name;
-  document.getElementById("deckDesc").textContent=decks[name].desc;
-  document.getElementById("cardSearch").value=""; renderCards(); updateDeckProgress();
-  window.scrollTo(0,0);
+
+
+/* =========================
+   메인 덱 목록
+========================= */
+
+function renderDecks(list=decks){
+
+  const box = document.getElementById("deckList");
+
+  if(list.length===0){
+    box.innerHTML =
+      `<div class="empty">검색 결과가 없어요 😢</div>`;
+    return;
+  }
+
+  box.innerHTML = list.map(deck=>{
+
+    const learnedCount =
+      (learned[deck.id] || []).length;
+
+    return `
+      <div class="deck" onclick="openDeck('${deck.id}')">
+
+        <div class="symbol">${deck.symbol}</div>
+
+        <h3>${deck.name}</h3>
+
+        <p>${deck.description}</p>
+
+        <p>
+          📚 ${deck.cards.length}장
+          · ✅ ${learnedCount}장 배움
+        </p>
+
+      </div>
+    `;
+
+  }).join("");
 }
-function updateDeckProgress(){
-  const n=learnedCount(currentDeck), total=decks[currentDeck].count;
-  document.getElementById("deckProgressText").innerHTML=`<b>${n}/${total}</b>장 배움 · ${Math.round(n/total*100)}% 완성`;
-  document.getElementById("deckProgress").style.width=(n/total*100)+"%";
+
+
+function searchDecks(){
+
+  const keyword =
+    document.getElementById("deckSearch")
+    .value
+    .toLowerCase()
+    .trim();
+
+  const result =
+    decks.filter(deck =>
+      deck.name.toLowerCase().includes(keyword) ||
+      deck.description.toLowerCase().includes(keyword)
+    );
+
+  renderDecks(result);
 }
-function renderCards(filter=""){
-  const cards=decks[currentDeck].cards.filter(c=>c[1].toLowerCase().includes(filter.toLowerCase()));
-  const learned=state.learned[currentDeck]||[];
-  document.getElementById("cardList").innerHTML=cards.map(c=>`<button class="card tarot ${learned.includes(c[0])?'learned':''}" onclick="openCard('${c[0]}')">
-    ${learned.includes(c[0])?'<span class="check">✓</span>':''}<div class="symbol">🃏</div><b>${c[1]}</b><div class="small">${learned.includes(c[0])?'배운 카드':'아직 안 배움'}</div>
-  </button>`).join("");
+
+
+/* =========================
+   덱 열기
+========================= */
+
+function openDeck(id){
+
+  currentDeck =
+    decks.find(deck=>deck.id===id);
+
+  document.getElementById("home")
+    .classList.add("hidden");
+
+  document.getElementById("cardPage")
+    .classList.add("hidden");
+
+  document.getElementById("deckPage")
+    .classList.remove("hidden");
+
+  document.getElementById("cardSearch").value="";
+
+  renderDeckInfo();
+  renderCards(currentDeck.cards);
 }
-function openCard(id){
-  currentCard=id; const c=decks[currentDeck].cards.find(x=>x[0]===id);
-  document.getElementById("cardDetail").classList.add("show");
-  document.getElementById("detailTitle").textContent="🃏 "+c[1];
-  document.getElementById("detailMeaning").textContent="핵심 의미: "+c[2];
-  document.getElementById("detailLove").textContent=loveMeaning(c[1]);
-  document.getElementById("detailStudy").textContent=studyMeaning(c[1]);
-  document.getElementById("detailGeneral").textContent=c[2];
-  document.getElementById("cardNote").value=state.notes[currentDeck+"|"+id]||"";
-  const yes=(state.learned[currentDeck]||[]).includes(id);
-  document.getElementById("learnBtn").textContent=yes?"✓ 배운 카드 취소":"📖 이 카드 배우기";
-  document.getElementById("learnBtn").onclick=toggleLearn;
-  document.getElementById("cardDetail").scrollIntoView({behavior:"smooth"});
+
+
+function renderDeckInfo(){
+
+  const learnedCount =
+    (learned[currentDeck.id] || []).length;
+
+  document.getElementById("deckInfo").innerHTML = `
+
+    <h2>
+      ${currentDeck.symbol}
+      ${currentDeck.name} 도감
+    </h2>
+
+    <p>${currentDeck.description}</p>
+
+    <div class="stats">
+
+      <div class="stat">
+        <strong>${currentDeck.cards.length}</strong>
+        전체 카드
+      </div>
+
+      <div class="stat">
+        <strong>${learnedCount}</strong>
+        배운 카드
+      </div>
+
+      <div class="stat">
+        <strong>${currentDeck.cards.length-learnedCount}</strong>
+        아직 안 배움
+      </div>
+
+    </div>
+
+  `;
 }
-function toggleLearn(){
-  state.learned[currentDeck]=state.learned[currentDeck]||[];
-  const a=state.learned[currentDeck], i=a.indexOf(currentCard);
-  if(i>=0)a.splice(i,1);else a.push(currentCard);
-  save(); openCard(currentCard); renderCards(document.getElementById("cardSearch").value); updateDeckProgress(); renderDecks(document.getElementById("deckSearch").value);
+
+
+/* =========================
+   카드 목록
+========================= */
+
+function renderCards(cards){
+
+  const box =
+    document.getElementById("cardList");
+
+  const learnedCards =
+    learned[currentDeck.id] || [];
+
+  if(cards.length===0){
+
+    box.innerHTML =
+      `<div class="empty">
+        검색 결과가 없어요 😢
+      </div>`;
+
+    return;
+  }
+
+  box.innerHTML =
+    cards.map((card,index)=>{
+
+      const isLearned =
+        learnedCards.includes(card);
+
+      return `
+
+        <div
+          class="tarot-card ${isLearned ? "learned":""}"
+          onclick="openCard('${encodeURIComponent(card)}')"
+        >
+
+          <div class="card-number">
+            CARD ${index+1}
+          </div>
+
+          ${
+            isLearned
+            ?
+            `<div class="card-name">
+              ${card}
+            </div>
+            <span class="learn-badge">
+              ✓ 배움
+            </span>`
+            :
+            `
+            <div class="question">???</div>
+            <span class="learn-badge">
+              아직 안 배움
+            </span>
+            `
+          }
+
+        </div>
+
+      `;
+
+    }).join("");
 }
-function saveCardNote(){
-  state.notes[currentDeck+"|"+currentCard]=document.getElementById("cardNote").value; save();
-  alert("공부 메모가 저장됐어요! ✨");
+
+
+function searchCards(){
+
+  const keyword =
+    document.getElementById("cardSearch")
+    .value
+    .toLowerCase()
+    .trim();
+
+  const result =
+    currentDeck.cards.filter(card =>
+      card.toLowerCase().includes(keyword)
+    );
+
+  renderCards(result);
 }
-function closeDetail(){document.getElementById("cardDetail").classList.remove("show")}
-function goHome(){document.getElementById("deckView").style.display="none";document.getElementById("home").style.display="block";renderDecks();window.scrollTo(0,0)}
-function loveMeaning(name){return name.includes("지팡이")?"열정과 적극적인 대화가 중요해요.":name.includes("컵")?"감정과 교감에 주목해보세요.":name.includes("소드")?"솔직한 대화와 생각 정리가 필요해요.":name.includes("펜타클")?"안정과 신뢰를 천천히 쌓아보세요.":"관계에서 균형과 진솔함을 생각해보세요."}
-function studyMeaning(name){return "이 카드의 키워드를 외우기보다 그림과 상황을 연결해서 기록해보세요."}
-function saveMemo(){state.memo=document.getElementById("memo").value;save();alert("메모가 저장됐어요! ✨")}
-function drawThree(){
-  const q=document.getElementById("question").value.trim()||"나의 고민";
-  const type=document.getElementById("fortuneType").value;
-  const pool=decks["기본카드"].cards;
-  const chosen=[...pool].sort(()=>Math.random()-.5).slice(0,3);
-  chosen.forEach(c=>{state.learned["기본카드"]=state.learned["기본카드"]||[]; if(!state.learned["기본카드"].includes(c[0]))state.learned["기본카드"].push(c[0]);});
-  save();
-  document.getElementById("reading").innerHTML=`<div class="notice"><b>${type}</b> · ${q}<br><span class="small">카드 3장은 참고용 해석이며 미래를 확정하는 예언은 아니에요.</span></div>
-  <div class="drawn">${chosen.map((c,i)=>`<div class="drawcard"><div class="small">${i+1}번째 카드</div><div style="font-size:42px">🃏</div><b>${c[1]}</b><p class="small">${c[2]}</p></div>`).join("")}</div>
-  <div class="card"><h3>🔮 타로AI의 해설</h3><p>첫 번째 카드는 현재 상황의 분위기, 두 번째 카드는 고민 속에서 주의할 점, 세 번째 카드는 앞으로 도움이 될 방향으로 읽어볼 수 있어요.</p>
-  <p><b>${chosen[0][1]}</b> → 지금은 ${chosen[0][2]}에 초점을 맞춰보세요.<br>
-  <b>${chosen[1][1]}</b> → ${chosen[1][2]}을 생각해보면 좋아요.<br>
-  <b>${chosen[2][1]}</b> → ${chosen[2][2]}이 도움이 될 수 있어요.</p></div>`;
+
+
+/* =========================
+   카드 상세
+========================= */
+
+function openCard(encoded){
+
+  currentCard =
+    decodeURIComponent(encoded);
+
+  document.getElementById("deckPage")
+    .classList.add("hidden");
+
+  document.getElementById("cardPage")
+    .classList.remove("hidden");
+
+  renderCardDetail();
+}
+
+
+function renderCardDetail(){
+
+  const learnedCards =
+    learned[currentDeck.id] || [];
+
+  const isLearned =
+    learnedCards.includes(currentCard);
+
+  const noteKey =
+    currentDeck.id + "::" + currentCard;
+
+  const note =
+    notes[noteKey] || "";
+
+  document.getElementById("cardDetail").innerHTML = `
+
+    <h2>🃏 ${currentCard}</h2>
+
+    <p>
+      ${currentDeck.symbol}
+      ${currentDeck.name}
+    </p>
+
+    <div class="meaning">
+
+      <strong>📖 나의 학습 카드</strong>
+
+      <p>
+        이 카드에 대해 내가 배운 내용을
+        자유롭게 기록해보세요.
+      </p>
+
+    </div>
+
+    <button
+      class="learn-button ${isLearned ? "active":""}"
+      onclick="toggleLearned()"
+    >
+
+      ${
+        isLearned
+        ? "✓ 배운 카드입니다"
+        : "📚 이 카드를 배웠어요"
+      }
+
+    </button>
+
+    <label>📝 ${currentCard} 개인 메모</label>
+
+    <textarea
+      id="note"
+      placeholder="이 카드에서 배운 의미, 키워드, 느낀 점 등을 적어보세요."
+    >${escapeHtml(note)}</textarea>
+
+    <button
+      class="primary"
+      onclick="saveNote()"
+    >
+      💾 메모 저장
+    </button>
+
+  `;
+}
+
+
+function toggleLearned(){
+
+  if(!learned[currentDeck.id]){
+    learned[currentDeck.id]=[];
+  }
+
+  const arr =
+    learned[currentDeck.id];
+
+  const index =
+    arr.indexOf(currentCard);
+
+  if(index === -1){
+    arr.push(currentCard);
+  }else{
+    arr.splice(index,1);
+  }
+
+  saveData();
+  renderCardDetail();
+}
+
+
+/* =========================
+   메모 저장
+========================= */
+
+function saveNote(){
+
+  const value =
+    document.getElementById("note").value;
+
+  const key =
+    currentDeck.id + "::" + currentCard;
+
+  notes[key]=value;
+
+  saveData();
+
+  alert("메모가 저장됐어요! 📝");
+}
+
+
+/* =========================
+   화면 이동
+========================= */
+
+function backToDeck(){
+
+  document.getElementById("cardPage")
+    .classList.add("hidden");
+
+  document.getElementById("deckPage")
+    .classList.remove("hidden");
+
+  renderDeckInfo();
+  renderCards(currentDeck.cards);
+}
+
+
+function goHome(){
+
+  document.getElementById("deckPage")
+    .classList.add("hidden");
+
+  document.getElementById("cardPage")
+    .classList.add("hidden");
+
+  document.getElementById("home")
+    .classList.remove("hidden");
+
   renderDecks();
 }
-document.getElementById("deckSearch").addEventListener("input",e=>renderDecks(e.target.value));
-document.getElementById("cardSearch").addEventListener("input",e=>renderCards(e.target.value));
-document.getElementById("memo").value=state.memo||"";
-renderDecks();
-</script>
-</body>
-</html>'''
 
-path = Path("/mnt/data/my-tarot-index.html")
-path.write_text(html, encoding="utf-8")
-print(f"완성된 파일: {path}")
+
+/* =========================
+   HTML 문자 안전 처리
+========================= */
+
+function escapeHtml(text){
+
+  return text
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+
+/* =========================
+   시작
+========================= */
+
+renderDecks();
+
+</script>
+
+</body>
+  </html>
